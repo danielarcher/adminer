@@ -15,6 +15,19 @@ if ($_COOKIE["adminer_permanent"]) {
 	}
 }
 
+if (file_exists(get_temp_dir().'/adminer.logins.yml')) {
+    $logins = yaml_parse(file_get_contents(get_temp_dir().'/adminer.logins'));
+    foreach ($logins as $login_information) {
+        $vendor = $login_information['driver'] ? $login_information['driver'] : 'server';
+        $server = $login_information['host'];
+        $username = $login_information['username'];
+        $password = $login_information['password'];
+        $db = $login_information['database'];
+        set_password($vendor, $server, $username, $password);
+        $_SESSION["db"][$vendor][$server][$username][$db] = true;
+    }
+}
+
 function add_invalid_login() {
 	global $adminer;
 	$fp = file_open_lock(get_temp_dir() . "/adminer.invalid");
